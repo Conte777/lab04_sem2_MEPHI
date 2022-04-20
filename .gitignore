@@ -1,0 +1,11 @@
+.vscode/c_cpp_properties.json
+.vscode/launch.json
+.vscode/settings.json
+build/Debug/main4.o
+build/Debug/outDebug.exe
+build/Debug/string1.o
+build/Debug/tree.o
+build/Release/main4.o
+build/Release/outRelease.exe
+build/Release/string1.o
+build/Release/tree.o
