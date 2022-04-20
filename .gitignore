@@ -9,3 +9,7 @@ build/Release/main4.o
 build/Release/outRelease.exe
 build/Release/string1.o
 build/Release/tree.o
+build/Debug/outDebug
+build/Release/outRelease
+build/Debug/outdebug.dSYM/Contents/Resources/DWARF/outdebug
+build/Debug/outdebug.dSYM/Contents/Info.plist
