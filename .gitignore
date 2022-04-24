@@ -9,3 +9,5 @@ build/Release/main4.o
 build/Release/outRelease.exe
 build/Release/string1.o
 build/Release/tree.o
+build/Debug/write_text.o
+build/Release/write_text.o

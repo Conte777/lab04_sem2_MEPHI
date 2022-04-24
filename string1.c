@@ -99,3 +99,87 @@ void print_string(string* s) {
 			for (int i = 0; i <= s->size; i++)
 				printf("%c", s->string[i]);
 }
+
+int create_random_string(string** s, int size) {
+	if (size < 0)
+		return UN1;
+	*s = (string*)calloc(1, sizeof(string));
+	if (*s == NULL)
+		return OF1;
+	(*s)->size = size;
+	(*s)->string = (char*)calloc((*s)->size + 2, sizeof(char));
+	if ((*s)->string == NULL) {
+		free(*s);
+		return OF1;
+	}
+	for (int i = 0; i <= (*s)->size; i++)
+		(*s)->string[i] = 'a' + rand() % 26;
+	(*s)->string[(*s)->size + 1] = '\0';
+	return OK1;
+}
+
+int create_random_arr_of_string(string*** arr_s, int arr_size, int el_size) {
+	if (arr_size < 1 || el_size < 0)
+		return UN1;
+	*arr_s = (string**)calloc(arr_size, sizeof(string*));
+	if (*arr_s == NULL)
+		return OF1;
+	int error;
+	for (int i = 0; i < arr_size; i++) {
+		error = create_random_string(&(*arr_s)[i], el_size);
+		if (error) {
+			for (int j = 0; j < i; j++)
+				free_s(&(*arr_s)[i]);
+			free(*arr_s);
+			return error;
+		}
+	}
+	return OK1;
+}
+
+int from_upper_case_to_lower_case(char* a) {
+	int b = (int)(*a);
+	if (b >= 65 && b <= 90) {
+		*a = (char)(b + 32);
+		return OK1;
+	}
+	else
+		return UN1;
+}
+
+int read_word_without_upper_lower_case_and_punctuation_marks(string** s) {
+	*s = (string*)calloc(1, sizeof(string));
+	(*s)->size = -1;
+	char a;
+	char* p = NULL;
+	int b = scanf("%c", &a);
+	if (b < 0)
+		return CZ1;
+	while (a == '\n' || a == ' ' || a == ',' || a == '.')
+		scanf("%c", &a);
+	while (a != ' ' && a != '\n' && b > 0) {
+		if (a != ',' || a != '.') {
+			from_upper_case_to_lower_case(&a);
+			(*s)->size++;
+			if ((*s)->string == NULL)
+				(*s)->string = (char*)malloc(sizeof(char));
+			else {
+				p = (*s)->string;
+				(*s)->string = (char*)realloc((*s)->string, ((*s)->size + 1) * sizeof(char));
+			}
+			if ((*s)->string == NULL) {
+				free(p);
+				return OF1;
+			}
+			(*s)->string[(*s)->size] = a;
+			b = scanf("%c", &a);
+			if (b < 0)
+				return CZ1;
+		}
+	}
+	(*s)->string = (char*)realloc((*s)->string, ((*s)->size + 2) * sizeof(char));
+	(*s)->string[(*s)->size + 1] = '\0';
+	if (a == '\n')
+		return -1;
+	return OK1;
+}

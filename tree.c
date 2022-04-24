@@ -61,18 +61,20 @@ int add_e(tree* t, string* key, string* info, string** data) {
 int scan(tree* t, string* key, tree** info) {
 	if (t == NULL || key == NULL)
 		return UN;
-	if (t->key == NULL)
+	if (t->key == NULL && t->info == NULL)
 		return UN;
 	if (strcmp(t->key->string, key->string) == 0) {
 		*info = t;
 		return OK;
 	}
 	if (strcmp(t->key->string, key->string) > 0)
-		if (scan(t->left, key, info) == OK)
-			return OK;
+		if (t->left != NULL)
+			if (scan(t->left, key, info) == OK)
+				return OK;
 	if (strcmp(t->key->string, key->string) < 0)
-		if (scan(t->right, key, info) == OK)
-			return OK;
+		if (t->right != NULL)
+			if (scan(t->right, key, info) == OK)
+				return OK;
 	return UN;
 }
 
@@ -184,7 +186,7 @@ int del_e(tree** t, string* key) {
 int print_tree(tree* t, string* key1, string* key2) {
 	if (t == NULL || key1 == NULL || key2 == NULL)
 		return UN;
-	if (t->key == NULL && t->key == NULL)
+	if (t->key == NULL && t->info == NULL)
 		return UN;
 	if (t->parent == NULL)
 		printf("key info\n");
@@ -206,6 +208,8 @@ int format_tree(tree* t, int p) {
 		return UN;
 	if (t->key == NULL && t->info == NULL)
 		return UN;
+	print_string(t->key);
+	printf(" ");
 	print_string(t->info);
 	printf("\n");
 	if (t->left != NULL || t->right != NULL) {
@@ -249,6 +253,74 @@ int from_file(tree* t, string* file_name) {
 	return OK;
 }
 
+void free_tree(tree* t) {
+	if (t != NULL) {
+		if (t->left != NULL)
+			free_tree(t->left);
+		if (t->right != NULL)
+			free_tree(t->right);
+		t->right = NULL;
+		t->left = NULL;
+		free_s(&t->key);
+		free_s(&t->info);
+		free(t);
+	}
+}
+
+int viz_tree(tree* t, FILE* file) {
+	if (t == NULL)
+		return UN;
+	if (t->key == NULL && t->info == NULL)
+		return UN;
+	if (t->parent == NULL)
+		fprintf(file, "digraph viz {\n");
+	if (t->parent == NULL && t->left == NULL && t->right == NULL) {
+		fprintf(file, "\"Key: ");
+		fwrite(t->key->string, sizeof(char), t->key->size + 1, file);
+		fprintf(file, "\\nInfo: ");
+		fwrite(t->info->string, sizeof(char), t->info->size + 1, file);
+		fprintf(file, "\"");
+	}
+	if (t->left != NULL) {
+		fprintf(file, "\"Key: ");
+		fwrite(t->key->string, sizeof(char), t->key->size + 1, file);
+		fprintf(file, "\\nInfo: ");
+		fwrite(t->info->string, sizeof(char), t->info->size + 1, file);
+		fprintf(file, "\"");
+		fprintf(file, "->");
+		fprintf(file, "\"Key: ");
+		fwrite(t->left->key->string, sizeof(char), t->left->key->size + 1, file);
+		fprintf(file, "\\nInfo: ");
+		fwrite(t->left->info->string, sizeof(char), t->left->info->size + 1, file);
+		fprintf(file, "\"");
+		fprintf(file, ";\n");
+	}
+	if (t->right != NULL) {
+		fprintf(file, "\"Key: ");
+		fwrite(t->key->string, sizeof(char), t->key->size + 1, file);
+		fprintf(file, "\\nInfo: ");
+		fwrite(t->info->string, sizeof(char), t->info->size + 1, file);
+		fprintf(file, "\"");
+		fprintf(file, "->");
+		fprintf(file, "\"Key: ");
+		fwrite(t->right->key->string, sizeof(char), t->right->key->size + 1, file);
+		fprintf(file, "\\nInfo: ");
+		fwrite(t->right->info->string, sizeof(char), t->right->info->size + 1, file);
+		fprintf(file, "\"");
+		fprintf(file, ";\n");
+	}
+	if (t->left != NULL)
+		viz_tree(t->left, file);
+	if (t->right != NULL)
+		viz_tree(t->right, file);
+	if (t->parent == NULL) {
+		fseek(file, 0, SEEK_END);
+		fprintf(file, "\n}");
+	}
+	return OK;
+}
+
+/*
 int add_random(tree* t, int size, int flag) {
 	int k = 0;
 	for (int i = 0; i < size; i++) {
@@ -323,7 +395,8 @@ void test(tree** t, int size, float* tscan, float* tdel) {
 void stack_test() {
 	printf("Start test\n");
 	tree* t;
-	int size = 10, size2 = 5;
+	tree* info;
+	int size = 10, size2 = 5, flag = 0;
 	float* tscan = (float*)calloc(size, sizeof(float));
 	float* tdel = (float*)calloc(size, sizeof(float));
 	for (int j = 0; j < size2; j++) {
@@ -376,63 +449,126 @@ void test_add() {
 	}
 	free(tadd);
 }
+*/
 
-void free_tree(tree* t) {
-	if (t != NULL) {
-		if (t->left != NULL)
-			free_tree(t->left);
-		if (t->right != NULL)
-			free_tree(t->right);
-		t->right = NULL;
-		t->left = NULL;
-		free_s(&t->key);
-		free_s(&t->info);
-		free(t);
-	}
-}
-
-int viz_tree(tree* t, FILE* file) {
-	if (t == NULL)
+int add_unique_random_str_to_tree(tree* t, int count_of_el, int el_size) {
+	if (t == NULL || count_of_el < 0 || el_size < 0)
 		return UN;
-	if (t->key == NULL && t->info == NULL)
-		return UN;
-	if (t->parent == NULL)
-		fprintf(file, "digraph viz {");
-	if (t->left != NULL) {
-		fprintf(file, "\"Key: ");
-		fwrite(t->key->string, sizeof(char), t->key->size + 1, file);
-		fprintf(file, "\\nInfo: ");
-		fwrite(t->info->string, sizeof(char), t->info->size + 1, file);
-		fprintf(file, "\"");
-		fprintf(file, "->");
-		fprintf(file, "\"Key: ");
-		fwrite(t->left->key->string, sizeof(char), t->left->key->size + 1, file);
-		fprintf(file, "\\nInfo: ");
-		fwrite(t->left->info->string, sizeof(char), t->left->info->size + 1, file);
-		fprintf(file, "\"");
-		fprintf(file, ";");
-	}
-	if (t->right != NULL) {
-		fprintf(file, "\"Key: ");
-		fwrite(t->key->string, sizeof(char), t->key->size + 1, file);
-		fprintf(file, "\\nInfo: ");
-		fwrite(t->info->string, sizeof(char), t->info->size + 1, file);
-		fprintf(file, "\"");
-		fprintf(file, "->");
-		fprintf(file, "\"Key: ");
-		fwrite(t->right->key->string, sizeof(char), t->right->key->size + 1, file);
-		fprintf(file, "\\nInfo: ");
-		fwrite(t->right->info->string, sizeof(char), t->right->info->size + 1, file);
-		fprintf(file, "\"");
-		fprintf(file, ";");
-	}
-	if (t->left != NULL)
-		viz_tree(t->left, file);
-	if (t->right != NULL)
-		viz_tree(t->right, file);
-	if (t->parent == NULL) {
-		fseek(file, 0, SEEK_END);
-		fprintf(file, "}");
+	int error;
+	string* key = NULL, * info = NULL, * data = NULL;
+	for (int i = 0; i <= count_of_el; i++) {
+		error = create_random_string(&key, el_size);
+		if (error)
+			return error;
+		error = create_random_string(&info, 0);
+		if (error)
+			return error;
+		if (add_e(t, key, info, &data)) {
+			free_s(&key);
+			free_s(&data);
+			i--;
+		}
 	}
 	return OK;
+}
+
+int test_scan_del(int count_of_tests, int start_pos, int step, int count_of_steps, int size_of_arr_for_test, int el_size) {
+	printf("Test start\n");
+	tree* t;
+	tree* buffer;
+	srand(time(NULL));
+	double* scan_time = (double*)calloc(count_of_steps + 1, sizeof(double));
+	double* del_time = (double*)calloc(count_of_steps + 1, sizeof(double));
+	int error;
+	for (int i = 0; i < count_of_tests; i++) {
+		printf("\nTest #%d\n", i + 1);
+		string** arr_s;
+		double start, end;
+		error = create_random_arr_of_string(&arr_s, size_of_arr_for_test, el_size);
+		if (error)
+			return error;
+		create_tree(&t);
+		for (int j = 0; j <= count_of_steps; j++) {
+			//printf("\nElemets in tree: %d\n", start_pos + step * j);
+			int count_of_del = 0;
+			if (j == 0)
+				error = add_unique_random_str_to_tree(t, start_pos, el_size);
+			else
+				error = add_unique_random_str_to_tree(t, step, el_size);
+			if (error)
+				return error;
+			start = clock();
+			for (int k = 0; k < size_of_arr_for_test; k++)
+				scan(t, arr_s[k], &buffer);
+			end = clock();
+			//printf("%f ", ((float)(end - start)) / CLOCKS_PER_SEC);
+			scan_time[j] += (end - start) / (double)CLOCKS_PER_SEC;
+			start = clock();
+			for (int k = 0; k < size_of_arr_for_test; k++)
+				if (del_e(&t, arr_s[k]) == OK)
+					count_of_del++;
+			end = clock();
+			//printf("%f\n", ((float)(end - start)) / CLOCKS_PER_SEC);
+			del_time[j] += (end - start) / (double)CLOCKS_PER_SEC;
+			error = add_unique_random_str_to_tree(t, count_of_del, el_size);
+			if (error)
+				return error;
+		}
+		free_tree(t);
+		for (int j = 0; j < size_of_arr_for_test; j++)
+			free_s(&arr_s[j]);
+		free(arr_s);
+	}
+	printf("\nAvg time of tests\n");
+	for (int i = 0; i <= count_of_steps; i++) {
+		//scan_time[i] /= count_of_tests;
+		//del_time[i] /= count_of_tests;
+		printf("%f %f\n", scan_time[i] / (double)count_of_tests, del_time[i] / (double)count_of_tests);
+	}
+	free(scan_time);
+	free(del_time);
+	return OK;
+}
+
+int test_add(int count_of_tests, int start_pos, int step, int count_of_steps, int size_of_arr_for_test, int el_size) {
+	printf("Test start\n");
+	tree* t;
+	srand(time(NULL));
+	double* add_time = (double*)calloc(count_of_steps + 1, sizeof(double));
+	int error;
+	double start, end;
+	for (int i = 0; i < count_of_tests; i++) {
+		printf("\nTest #%d\n", i + 1);
+		string** arr_key, ** arr_info, * buffer = NULL;
+		error = create_random_arr_of_string(&arr_key, size_of_arr_for_test, el_size);
+		if (error)
+			return error;
+		error = create_random_arr_of_string(&arr_info, size_of_arr_for_test, 0);
+		if (error)
+			return error;
+		create_tree(&t);
+		for (int j = 0; j <= count_of_steps; j++) {
+			if (j == 0)
+				error = add_unique_random_str_to_tree(t, start_pos, el_size);
+			else
+				error = add_unique_random_str_to_tree(t, step - size_of_arr_for_test, el_size);
+			if (error)
+				return error;
+			start = clock();
+			for (int k = 0; k < size_of_arr_for_test; k++)
+				if (add_e(t, arr_key[k], arr_info[k], &buffer) == DB) {
+					free_s(&buffer);
+					free_s(&arr_key[k]);
+				}
+			end = clock();
+			//printf("%f\n", (end - start) / (double)CLOCKS_PER_SEC);
+			add_time[j] += (end - start) / (double)CLOCKS_PER_SEC;
+		}
+		free_tree(t);
+		free(arr_key);
+		free(arr_info);
+	}
+	for (int i = 0; i <= count_of_steps; i++)
+		printf("%f\n", add_time[i] / (double)count_of_tests);
+	free(add_time);
 }

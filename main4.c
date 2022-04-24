@@ -20,7 +20,6 @@ int choice(tree** t, int a) {
 	tree* info1 = NULL;
 	FILE* file = NULL;
 	int error;
-	float d, b;
 	clock_t start, end;
 	switch (a) {
 	case 1:
@@ -75,7 +74,6 @@ int choice(tree** t, int a) {
 		free_s(&key);
 		return OK;
 	case 4:
-		create_tree(&info1);
 		start = clock();
 		if (scan_max(*t, &info1) == OK) {
 			end = clock();
@@ -89,10 +87,6 @@ int choice(tree** t, int a) {
 			end = clock();
 			printf("Tree is empty\n");
 		}
-		info1->parent = NULL;
-		info1->right = NULL;
-		info1->left = NULL;
-		free_tree(info1);
 		printf("work time: %f\n", ((float)(end - start)) / CLOCKS_PER_SEC);
 		return OK;
 	case 5:
@@ -137,30 +131,24 @@ int choice(tree** t, int a) {
 		if (file == NULL)
 			return UN;
 		if (viz_tree(*t, file) == OK) {
+			fclose(file);
 			system("dot -Tpng viz.gv -o viz.png");
 			system("start viz.png");
 		}
-		else
+		else {
 			printf("Tree is empty.\n");
+			fclose(file);
+		}
 		remove("viz.gv");
-		fclose(file);
 		return OK;
-	case 9:
-		scanf("%d", &error);
-		start = clock();
-		add_random(*t, error, 1);
-		end = clock();
-		printf("work time: %f\n sec", ((float)(end - start)) / CLOCKS_PER_SEC);
-		return OK;
+		/*case 9:
+			write_text();
+			return OK;*/
 	case 10:
-		scanf("%d", &error);
-		test(t, error, &d, &b);
+		test_scan_del(10, 1000, 1000, 1099, 1000, 10);
 		return OK;
 	case 11:
-		stack_test();
-		return OK;
-	case 12:
-		test_add();
+		test_add(10, 1000, 1000, 1099, 500, 10);
 		return OK;
 	}
 	return CZ;
@@ -180,7 +168,7 @@ int scanfs(int* a, int b) {
 	return 0;
 }
 
-int main() {
+/*int main() {
 	int flag = 1, a = 0, b = 0;
 	tree* t;
 	create_tree(&t);
@@ -203,4 +191,4 @@ int main() {
 	}
 	free_tree(t);
 	return 0;
-}
+}*/

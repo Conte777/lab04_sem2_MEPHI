@@ -38,16 +38,22 @@ int from_file(tree* t, string* file_name);
 
 void free_tree(tree* t);
 
-int add_random(tree* t, int size, int flag);
-
-void test(tree** t, int size, float* tscan, float* tdel);
-
-string** create_arr_s_random(int size);
-
-string* create_s_random(int size, int ran);
-
-void stack_test();
-
-void test_add();
+//int add_random(tree* t, int size, int flag);
+//
+//void test(tree** t, int size, float* tscan, float* tdel);
+//
+//string** create_arr_s_random(int size);
+//
+//string* create_s_random(int size, int ran);
+//
+//void stack_test();
+//
+//void test_add();
 
 int viz_tree(tree* t, FILE* file);
+
+int add_unique_random_str_to_tree(tree* t, int count_of_el, int el_size);
+
+int test_scan_del(int count_of_tests, int start_pos, int step, int count_of_steps, int size_of_arr_for_test, int el_size);
+
+int test_add(int count_of_tests, int start_pos, int step, int count_of_steps, int size_of_arr_for_test, int el_size);
