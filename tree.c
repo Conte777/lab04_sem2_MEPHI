@@ -67,12 +67,12 @@ int scan(tree* t, string* key, tree** info) {
 		*info = t;
 		return OK;
 	}
-	if (strcmp(t->key->string, key->string) > 0)
-		if (t->left != NULL)
+	if (t->left != NULL)
+		if (strcmp(t->key->string, key->string) > 0)
 			if (scan(t->left, key, info) == OK)
 				return OK;
-	if (strcmp(t->key->string, key->string) < 0)
-		if (t->right != NULL)
+	if (t->right != NULL)
+		if (strcmp(t->key->string, key->string) < 0)
 			if (scan(t->right, key, info) == OK)
 				return OK;
 	return UN;
@@ -319,137 +319,6 @@ int viz_tree(tree* t, FILE* file) {
 	}
 	return OK;
 }
-
-/*
-int add_random(tree* t, int size, int flag) {
-	int k = 0;
-	for (int i = 0; i < size; i++) {
-		k++;
-		string* element1 = create_s_random(rand() % 1000 + 1, i + k);
-		string* element2 = create_s_random(rand() % 1000 + 1, i + k + 100);
-		string* element3 = NULL;
-		if (element1 == NULL || element2 == NULL)
-			return UN;
-		if (add_e(t, element1, element2, &element3) == DB) {
-			free_s(&element1);
-			free_s(&element3);
-			if (flag)
-				i--;
-		}
-	}
-	printf("iteration: %d\n", k);
-	return OK;
-}
-
-string* create_s_random(int size, int ran) {
-	string* element1 = (string*)calloc(1, sizeof(string));
-	element1->size = size;
-	element1->string = (char*)calloc(element1->size + 3, sizeof(char));
-	if (element1->string == NULL)
-		return NULL;
-	for (int j = 0; j <= element1->size; j++) {
-		srand(time(NULL) - j + ran);
-		element1->string[j] = '!' + rand() % (int)'~';
-	}
-	element1->string[element1->size + 2] = '\0';
-	return element1;
-}
-
-string** create_arr_s_random(int size) {
-	string** arr = (string**)calloc(size, sizeof(string*));
-	for (int i = 0; i < size; i++) {
-		arr[i] = create_s_random(rand() % 1000 + 1, i);
-	}
-	return arr;
-}
-
-void test(tree** t, int size, float* tscan, float* tdel) {
-	clock_t start, end;
-	tree* info;
-	int quantity = 10000, flag = 0;
-	start = clock();
-	add_random(*t, size, 1);
-	end = clock();
-	printf("work time add: %f sec\n", ((float)(end - start)) / CLOCKS_PER_SEC);
-	string** arr = create_arr_s_random(quantity);
-	start = clock();
-	for (int i = 0; i < quantity; i++)
-		scan(*t, arr[i], &info);
-	end = clock();
-	printf("work time scan: %f sec\n", ((float)(end - start)) / CLOCKS_PER_SEC);
-	*tscan += ((float)(end - start)) / CLOCKS_PER_SEC;
-	start = clock();
-	for (int i = 0; i < quantity; i++)
-		if (del_e(t, arr[i]) == OK)
-			flag++;
-	end = clock();
-	add_random(*t, flag, 1);
-	printf("work time del: %f sec\n", ((float)(end - start)) / CLOCKS_PER_SEC);
-	*tdel += ((float)(end - start)) / CLOCKS_PER_SEC;
-	for (int i = 0; i < quantity; i++) {
-		free_s(&arr[i]);
-	}
-	free(arr);
-}
-
-void stack_test() {
-	printf("Start test\n");
-	tree* t;
-	tree* info;
-	int size = 10, size2 = 5, flag = 0;
-	float* tscan = (float*)calloc(size, sizeof(float));
-	float* tdel = (float*)calloc(size, sizeof(float));
-	for (int j = 0; j < size2; j++) {
-		create_tree(&t);
-		printf("\n\ntest #%d\n", j + 1);
-		for (int i = 1; i <= size; i++) {
-			printf("\nsizeof arr: %d\n", i * 50000);
-			test(&t, 50000, &tscan[i - 1], &tdel[i - 1]);
-		}
-		free_tree(t);
-	}
-	for (int i = 0; i < size; i++) {
-		tscan[i] /= (float)size2;
-		tdel[i] /= (float)size2;
-		printf("\navg time of %d size\nscan: %f sec\ndel:  %f sec\n", (i + 1) * 50000, tscan[i], tdel[i]);
-	}
-	free(tscan);
-	free(tdel);
-}
-
-void test_add() {
-	tree* t;
-	string* s = NULL;
-	int test = 5, size = 10, start, end;
-	float* tadd = (float*)calloc(size, sizeof(float));
-	for (int i = 0; i < test; i++) {
-		printf("\n\ntest #%d\n", i + 1);
-		for (int j = 0; j < size; j++) {
-			create_tree(&t);
-			printf("\niteration: %d\n", (j + 1) * 50000);
-			string** key = create_arr_s_random((j + 1) * 50000);
-			string** info = create_arr_s_random((j + 1) * 50000);
-			start = clock();
-			for (int k = 0; k < (j + 1) * 50000; k++)
-				if (add_e(t, key[k], info[k], &s) == DB) {
-					free_s(&key[k]);
-					free_s(&s);
-				}
-			end = clock();
-			tadd[j] += ((float)(end - start)) / CLOCKS_PER_SEC;
-			printf("time add: %f sec\n", ((float)(end - start)) / CLOCKS_PER_SEC);
-			free_tree(t);
-			free(key);
-			free(info);
-		}
-	}
-	for (int i = 0; i < size; i++) {
-		tadd[i] /= test;
-		printf("avg time add of size %d: %f sec\n", (i + 1) * 50000, tadd[i]);
-	}
-	free(tadd);
-}
-*/
 
 int add_unique_random_str_to_tree(tree* t, int count_of_el, int el_size) {
 	if (t == NULL || count_of_el < 0 || el_size < 0)

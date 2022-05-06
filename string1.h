@@ -30,4 +30,4 @@ int create_random_string(string** s, int size);
 
 int create_random_arr_of_string(string*** arr_s, int arr_size, int el_size);
 
-int read_word_without_upper_lower_case_and_punctuation_marks(string** s);
+int read_word_without_upper_lower_case_and_punctuation_marks(string** s, FILE* file);

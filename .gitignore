@@ -11,3 +11,6 @@ build/Debug/write_text.o
 build/Release/write_text.o
 build/Debug/outDebug.exe
 .gitignore
+build/Release/outRelease.exe
+count words file.txt
+text.txt

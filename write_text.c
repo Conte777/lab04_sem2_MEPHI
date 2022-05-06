@@ -1,4 +1,4 @@
-#include "D:\GAMES\Учеба\test\tree.h"
+#include "tree.h"
 
 int pow10(int a) {
 	if (a == 0)
@@ -46,9 +46,9 @@ int char_to_int(string* s, int* data) {
 			return UN;
 		}
 		count++;
-		*data = count;
-		return OK;
 	}
+	*data = count;
+	return OK;
 }
 
 int int_to_char(string** data, int a) {
@@ -108,59 +108,85 @@ int int_to_char(string** data, int a) {
 	return OK;
 }
 
-int print_count(tree* t) {
+int print_count_to_file(tree* t, FILE* file) {
 	if (t == NULL)
 		return UN;
 	if (t->key == NULL && t->info == NULL)
 		return UN;
 	if (t->parent == NULL)
-		printf("word count\n");
+		fprintf(file, "word count\n");
 	if (t->left != NULL)
-		print_count(t->left);
-	print_string(t->key);
-	printf(" ");
-	print_string(t->info);
-	printf("\n");
+		print_count_to_file(t->left, file);
+	// print_string(t->key);
+	// printf(" ");
+	// print_string(t->info);
+	// printf("\n");
+	for (int i = 0; i <= t->key->size; i++)
+		fprintf(file, "%c", t->key->string[i]);
+	fprintf(file, " ");
+	for (int i = 0; i <= t->info->size; i++)
+		fprintf(file, "%c", t->info->string[i]);
+	fprintf(file, "\n");
 	if (t->right != NULL)
-		print_count(t->right);
+		print_count_to_file(t->right, file);
+	return OK;
+}
+int abc = 0;
+int write_text() {
+	tree* t, * data;
+	string* key, * count = NULL, * buf, * file_name;
+	int error, buffer;
+	FILE* file = NULL, * count_words_file = NULL;
+	get_s(&file_name);
+	file = fopen(file_name->string, "r");
+	if (file == NULL) {
+		printf("Unable to open the file");
+		free_s(&file_name);
+		return UN;
+	}
+	create_tree(&t);
+	error = read_word_without_upper_lower_case_and_punctuation_marks(&key, file);
+	while (1) {
+		if (error != UN) {
+			if (scan(t, key, &data) == OK) {
+				if (char_to_int(data->info, &buffer) == OK) {
+					if (int_to_char(&count, buffer) == OK) {
+						add_e(t, key, count, &buf);
+						abc++;
+						free_s(&key);
+						free_s(&buf);
+					}
+				}
+			}
+			else {
+				count = (string*)calloc(1, sizeof(string));
+				count->size = 0;
+				count->string = (char*)calloc(2, sizeof(char));
+				count->string[0] = '1';
+				count->string[1] = '\0';
+				add_e(t, key, count, &buf);
+				abc++;
+			}
+		}
+		if (error == CZ)
+			break;
+		error = read_word_without_upper_lower_case_and_punctuation_marks(&key, file);
+	}
+	count_words_file = fopen("count words file.txt", "w+");
+	if (count_words_file == NULL)
+		return UN;
+	print_count_to_file(t, count_words_file);
+	free_s(&file_name);
+	fclose(file);
+	free_s(&key);
+	fclose(count_words_file);
+	free_tree(t);
 	return OK;
 }
 
-int write_text() {
-	tree* t, * data;
-	string* key, * count = NULL, * buf;
-	int error, buffer;
-	create_tree(&t);
-	error = read_word_without_upper_lower_case_and_punctuation_marks(&key);
-	while (!error || error == -1) {
-		if (scan(t, key, &data) == OK) {
-			if (char_to_int(data->info, &buffer) == OK) {
-				if (int_to_char(&count, buffer) == OK) {
-					add_e(t, key, count, &buf);
-					free_s(&key);
-					free_s(&buf);
-				}
-			}
-		}
-		else {
-			count = (string*)calloc(1, sizeof(string));
-			count->size = 0;
-			count->string = (char*)calloc(2, sizeof(char));
-			count->string[0] = '1';
-			count->string[1] = '\0';
-			add_e(t, key, count, &buf);
-		}
-		if (error == -1)
-			break;
-		error = read_word_without_upper_lower_case_and_punctuation_marks(&key);
-	}
-	free_s(&key);
-	print_count(t);
-	free_tree(t);
-}
-
 int main() {
-	printf("Start entering text: ");
+	printf("Enter path to file: ");
 	write_text();
+	printf("%d", abc);
 	return OK;
 }

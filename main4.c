@@ -1,5 +1,7 @@
 #include "tree.h"
+
 // 1 59 59 1 53 53 1 3 3 1 43 43 1 51 51 1 86 86 1 62 62 1 24 24 1 93 93 1 33 33
+
 int scanfs(int* a, int b);
 int errors_get(int a, string* s);
 int choice(tree** t, int a);

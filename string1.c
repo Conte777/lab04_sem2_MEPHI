@@ -147,8 +147,8 @@ int from_upper_case_to_lower_case(char* a) {
 		return UN1;
 }
 
-int read_word_without_upper_lower_case_and_punctuation_marks(string** s) {
-	*s = (string*)calloc(1, sizeof(string));
+int read_word_without_upper_lower_case_and_punctuation_marks(string** s, FILE* file) {
+	/**s = (string*)calloc(1, sizeof(string));
 	(*s)->size = -1;
 	char a;
 	char* p = NULL;
@@ -181,5 +181,40 @@ int read_word_without_upper_lower_case_and_punctuation_marks(string** s) {
 	(*s)->string[(*s)->size + 1] = '\0';
 	if (a == '\n')
 		return -1;
+	return OK1;*/
+	* s = (string*)calloc(1, sizeof(string));
+	(*s)->string = (char*)calloc(1, sizeof(char));
+	(*s)->size = -1;
+	char buffer_char = ' ';
+	int scan_simbols = 0;
+	scan_simbols = fscanf(file, "%c", &buffer_char);
+	while (buffer_char != ' ' && buffer_char != '\n' && scan_simbols >= 1) {
+		if (buffer_char != '.' && buffer_char != '!' && buffer_char != ',' && buffer_char != '-' && buffer_char != '?' && buffer_char != '\"') {
+			(*s)->size++;
+			char* ptr = (char*)realloc((*s)->string, (*s)->size + 2);
+			if (ptr == NULL) {
+				free((*s)->string);
+				free(*s);
+				return OF1;
+			}
+			else
+				(*s)->string = ptr;
+			from_upper_case_to_lower_case(&buffer_char);
+			(*s)->string[(*s)->size] = buffer_char;
+			scan_simbols = fscanf(file, "%c", &buffer_char);
+		}
+		else
+			scan_simbols = fscanf(file, "%c", &buffer_char);
+	}
+	if (scan_simbols <= 0) {
+		(*s)->string[(*s)->size + 1] = '\0';
+		return CZ1;
+	}
+	if ((*s)->size == -1) {
+		free((*s)->string);
+		free(*s);
+		return UN1;
+	}
+	(*s)->string[(*s)->size + 1] = '\0';
 	return OK1;
 }
