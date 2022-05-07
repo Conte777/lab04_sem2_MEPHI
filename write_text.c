@@ -184,9 +184,9 @@ int write_text() {
 	return OK;
 }
 
-int main() {
-	printf("Enter path to file: ");
-	write_text();
-	printf("%d", abc);
-	return OK;
-}
+// int main() {
+// 	printf("Enter path to file: ");
+// 	write_text();
+// 	printf("%d", abc);
+// 	return OK;
+// }

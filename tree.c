@@ -27,12 +27,14 @@ int add_e(tree* t, string* key, string* info, string** data) {
 				ptr = t->left;
 			else
 				ptr = t->right;
-			while (ptr != NULL && strcmp(par->key->string, key->string) != 0) {
+			while (ptr != NULL) {
 				tree* p = ptr;
 				if (strcmp(key->string, par->key->string) < 0)
 					ptr = par->left;
-				else
+				if (strcmp(key->string, par->key->string) > 0)
 					ptr = par->right;
+				if (strcmp(key->string, par->key->string) == 0)
+					break;
 				par = p;
 			}
 			if (strcmp(key->string, par->key->string) == 0) {
@@ -409,14 +411,14 @@ int test_add(int count_of_tests, int start_pos, int step, int count_of_steps, in
 	for (int i = 0; i < count_of_tests; i++) {
 		printf("\nTest #%d\n", i + 1);
 		string** arr_key, ** arr_info, * buffer = NULL;
-		error = create_random_arr_of_string(&arr_key, size_of_arr_for_test, el_size);
-		if (error)
-			return error;
-		error = create_random_arr_of_string(&arr_info, size_of_arr_for_test, 0);
-		if (error)
-			return error;
 		create_tree(&t);
 		for (int j = 0; j <= count_of_steps; j++) {
+			error = create_random_arr_of_string(&arr_key, size_of_arr_for_test, el_size);
+			if (error)
+				return error;
+			error = create_random_arr_of_string(&arr_info, size_of_arr_for_test, 0);
+			if (error)
+				return error;
 			if (j == 0)
 				error = add_unique_random_str_to_tree(t, start_pos, el_size);
 			else
@@ -425,19 +427,17 @@ int test_add(int count_of_tests, int start_pos, int step, int count_of_steps, in
 				return error;
 			start = clock();
 			for (int k = 0; k < size_of_arr_for_test; k++)
-				if (add_e(t, arr_key[k], arr_info[k], &buffer) == DB) {
-					free_s(&buffer);
-					free_s(&arr_key[k]);
-				}
+				add_e(t, arr_key[k], arr_info[k], &buffer);
 			end = clock();
 			//printf("%f\n", (end - start) / (double)CLOCKS_PER_SEC);
 			add_time[j] += (end - start) / (double)CLOCKS_PER_SEC;
+			free(arr_key);
+			free(arr_info);
 		}
 		free_tree(t);
-		free(arr_key);
-		free(arr_info);
 	}
 	for (int i = 0; i <= count_of_steps; i++)
 		printf("%f\n", add_time[i] / (double)count_of_tests);
 	free(add_time);
+	return OK;
 }

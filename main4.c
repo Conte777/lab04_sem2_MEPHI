@@ -143,14 +143,11 @@ int choice(tree** t, int a) {
 		}
 		remove("viz.gv");
 		return OK;
-		/*case 9:
-			write_text();
-			return OK;*/
 	case 10:
 		test_scan_del(10, 1000, 1000, 1099, 1000, 10);
 		return OK;
 	case 11:
-		test_add(10, 1000, 1000, 1099, 500, 10);
+		test_add(10, 1000, 1000, 1099, 999, 10);
 		return OK;
 	}
 	return CZ;
@@ -170,14 +167,14 @@ int scanfs(int* a, int b) {
 	return 0;
 }
 
-/*int main() {
+int main() {
 	int flag = 1, a = 0, b = 0;
 	tree* t;
 	create_tree(&t);
 	while (flag) {
 		printf("\nEnter the number of the item to be executed\n0. Exit\n1. Add new element\n2. Scan\n3. Delete\n4. Scaning max\n5. Add items from a file\n6. Print format tree\n7. Print tree\n8. Vizual tree\nEnter number: ");
 		b = scanf("%d", &a);
-		// system("cls");
+		//system("cls");
 		if (b > 0 && a > 0 && a <= 12) {
 			if (choice(&t, a) == CZ)
 				flag = 0;
@@ -193,4 +190,4 @@ int scanfs(int* a, int b) {
 	}
 	free_tree(t);
 	return 0;
-}*/
+}
